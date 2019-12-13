@@ -108,6 +108,14 @@ func (a *app) signalHandler(wg *sync.WaitGroup) {
 		case syscall.SIGINT, syscall.SIGTERM:
 			// this ensures a subsequent INT/TERM will trigger standard go behaviour of
 			// terminating.
+
+			// k8s terminate use signal syscall.SIGTERM(terminated)
+			// need to close my job in 30s
+			err := a.preStartProcess()
+			if err != nil {
+				a.errors <- err
+			}
+
 			signal.Stop(ch)
 			a.term(wg)
 			return
